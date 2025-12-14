@@ -12,8 +12,8 @@ const Header = () => {
         <div className="relative flex items-center h-16 md:h-20">
           {/* Left: Logo */}
           <a href="/" className="flex items-center gap-2 z-20">
-            <div className="w-10 h-10 rounded-xl bg-gradient-hero from-primary to-primary/70 flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-lg">U</span>
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img className="rounded-sm" src="/logo1.png" alt="" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
               Upaon<span className="text-primary">Services</span>
