@@ -9,7 +9,7 @@ function handleChoose(path: "/cadastro/cliente" | "/cadastro/prestador") {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-sunset from-orange-50 to-orange-100 px-4">
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8 space-y-8">
+      <div className="animate-fade-in w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8 space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">
             Como você deseja usar a {""}
