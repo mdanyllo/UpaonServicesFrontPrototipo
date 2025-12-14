@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -99,12 +99,9 @@ export function LoginPage() {
 
         <p className="text-sm text-muted-foreground text-center mt-4">
           Não tem uma conta?{" "}
-          <a
-            href="/cadastro "
-            className="text-primary font-medium hover:underline"
-          >
+          <Link className="text-primary font-medium hover:underline" to="/cadastro">
             Cadastre-se
-          </a>
+          </Link>
         </p>
       </form>
     </section>
