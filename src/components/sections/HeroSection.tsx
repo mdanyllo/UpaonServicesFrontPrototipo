@@ -131,8 +131,8 @@ const HeroSection = () => {
               <p className="text-sm text-muted-foreground">Usuários</p>
             </div>
             <div className="text-center">
-              <p className="font-display font-bold text-2xl md:text-3xl text-foreground">2.5</p>
-              <p className="text-sm text-muted-foreground">Serviços</p>
+              <p className="font-display font-bold text-2xl md:text-3xl text-foreground">10+</p>
+              <p className="text-sm text-muted-foreground">Categorias</p>
             </div>
           </div>
         </div>
