@@ -4,16 +4,18 @@ import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom"
 
 const categories = [
-  "Eletricista",
-  "Encanador",
-  "Técnico em Informática",
-  "Diarista",
-  "Pintor",
-  "Pedreiro",
-  "Mecânico",
-  "Montador de Móveis",
-  "Refrigeração",
-  "Barbeiro",
+  "Tecnologia",
+  "Reparos",
+  "Limpeza",
+  "Pintura",
+  "Construção",
+  "Beleza",
+  "Babá",
+  "Cuidadores",
+  "Culinária",
+  "Mudança",
+  "Fotografia",
+  "Motoristas",
   "Outros",
 ]
 
@@ -47,7 +49,7 @@ export function Prestador() {
 
     try {
       const res = await fetch(
-        "https://upaonservicesbackprototipo.onrender.com/auth/register",
+        "http://localhost:3333/auth/register",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
