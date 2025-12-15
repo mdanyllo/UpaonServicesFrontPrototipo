@@ -37,7 +37,7 @@ const HowItWorksSection = () => {
             Simples e rápido
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Em apenas 3 passos você encontra o profissional ideal para o seu serviço
+            Em apenas 3 passos você encontra o profissional ideal para o seu serviço na <span className="text-gradient-hero">UpaonServices</span>
           </p>
         </div>
 

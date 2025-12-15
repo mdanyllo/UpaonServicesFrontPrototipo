@@ -20,8 +20,7 @@ const Footer = () => {
               </span>
             </a>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-6">
-              Conectando trabalhadores e clientes em São Luís do Maranhão. 
-              A melhor plataforma de serviços da Ilha.
+              A Upaon Services é uma plataforma criada para facilitar a conexão entre clientes e prestadores de serviços na ilha de São Luís, oferecendo segurança, praticidade e profissionais avaliados.
             </p>
             <div className="flex items-center gap-3">
               <a
