@@ -139,10 +139,10 @@ function handleSearch(value?: string) {
             </div>
           </div>
 
-          {/* Populares */}
+          {/* Recomendadas */}
           <div className="mt-8">
             <p className="text-sm text-muted-foreground mb-3 animate-fade-in">
-              Buscas populares:
+              Buscas recomendadas:
             </p>
 
             <div className="flex flex-wrap justify-center gap-2 animate-fade-in">
@@ -160,7 +160,7 @@ function handleSearch(value?: string) {
             </div>
           </div>
 
-          {/* Stats */}
+          {/* Stats */}{/* Mais pra frente quando tiver mais gente
           <div className="grid grid-cols-3 gap-8 mt-16 max-w-xl mx-auto animate-fade-in">
             <div>
               <p className="font-bold text-2xl">{stats?.providers ?? 0}</p>
@@ -174,7 +174,7 @@ function handleSearch(value?: string) {
               <p className="font-bold text-2xl">10+</p>
               <p className="text-sm text-muted-foreground">Categorias</p>
             </div>
-          </div>
+          </div>*/}
 
         </div>
       </div>

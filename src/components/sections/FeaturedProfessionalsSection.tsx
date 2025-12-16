@@ -56,10 +56,10 @@ const FeaturedProfessionalsSection = () => {
               Em Destaque
             </span>
             <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-2">
-              Profissionais bem avaliados
+            {/*Profissionais bem avaliados*/} Profissionais novos na plataforma
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              Conheça alguns dos profissionais mais bem avaliados da nossa plataforma
+              {/*Conheça alguns dos profissionais mais bem avaliados da nossa plataforma*/} Conheça os primeiros usuários da plataforma
             </p>
           </div>
           <Button variant="outline" size="lg">
@@ -127,7 +127,7 @@ const FeaturedProfessionalsSection = () => {
                       <MapPin className="w-4 h-4" />
                       <span>{city}</span>
                       <span className="mx-1">•</span>
-                      <span>N ovo na plataforma</span>
+                      <span>Novo na plataforma</span>
                     </div>
 
                     <div className="flex items-center justify-between pt-4 border-t border-border">

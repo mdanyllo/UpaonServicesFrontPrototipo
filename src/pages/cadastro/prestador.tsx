@@ -32,9 +32,6 @@ export function Prestador() {
   const [category, setCategory] = useState("")
   const [acceptTerms, setAcceptTerms] = useState(false)
 
-  const [city, setCity] = useState("")
-  const [neighborhood, setNeighborhood] = useState("")
-
   const navigate = useNavigate()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -43,6 +40,7 @@ export function Prestador() {
 
     if (!acceptTerms) {
       setError("Você precisa aceitar os Termos de Uso para continuar.")
+        setLoading(false)
       return
     }
 
@@ -62,8 +60,8 @@ export function Prestador() {
       phone: formData.get("phone") as string,
       description: formData.get("description") as string,
       category: finalCategory,
-      city,
-      neighborhood,
+      city: formData.get("city") as string, 
+      neighborhood: formData.get("neighborhood") as string,
       role: "PROVIDER",
     }
 
@@ -117,8 +115,7 @@ export function Prestador() {
           <Input name="phone" placeholder="Telefone (opcional)" className="rounded-xl" />
 
           <select
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
+            name="city"
             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
             required
           >
@@ -131,9 +128,8 @@ export function Prestador() {
           </select>
 
           <Input
-            placeholder="Bairro (ex: Cohama, Calhau, Cidade Operária)"
-            value={neighborhood}
-            onChange={(e) => setNeighborhood(e.target.value)}
+            name="neighborhood"
+            placeholder="Bairro (ex: Cohama, Calhau)"
             className="rounded-xl"
           />
 

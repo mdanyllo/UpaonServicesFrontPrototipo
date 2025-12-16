@@ -70,9 +70,10 @@ const CategoriesSection = () => {
               <h3 className="font-display font-semibold text-foreground mb-1">
                 {category.name}
               </h3>
+              {/* Mais pra frente, quando tiver mais gente
               <p className="text-sm text-muted-foreground">
                 {category.count} profissionais
-              </p>
+              </p>*/}
             </button>
           ))}
         </div>
