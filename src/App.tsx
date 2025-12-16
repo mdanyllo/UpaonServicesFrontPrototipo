@@ -10,6 +10,9 @@ import { Prestador } from "./pages/cadastro/prestador";
 import { Cliente } from "./pages/cadastro/cliente";
 import { LoginPage } from "./pages/login";
 import { ResultadosPesquisa } from "./pages/resultadospesquisa";
+import { CentralDeAjuda } from "./pages/suporte/centraldeajuda";
+import { TermosDeUso } from "./pages/suporte/termosdeuso";
+import { PoliticaDePrivacidade } from "./pages/suporte/politicadeprivacidade";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/cadastro/cliente" element={<Cliente />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="/resultados"element={<ResultadosPesquisa />}/>
+          <Route path="/suporte/centraldeajuda" element={<CentralDeAjuda />} />
+          <Route path="/suporte/termosdeuso" element={<TermosDeUso/>} />
+          <Route path="/suporte/politicadeprivacidade" element={<PoliticaDePrivacidade/>} />
 
         </Routes>
       </BrowserRouter>

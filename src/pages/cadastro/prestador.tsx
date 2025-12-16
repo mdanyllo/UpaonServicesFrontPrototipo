@@ -19,16 +19,34 @@ const categories = [
   "Outros",
 ]
 
+const cities = [
+  "São Luís - MA",
+  "São José de Ribamar - MA",
+  "Paço do Lumiar - MA",
+  "Raposa - MA",
+]
+
 export function Prestador() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [category, setCategory] = useState("")
+  const [acceptTerms, setAcceptTerms] = useState(false)
+
+  const [city, setCity] = useState("")
+  const [neighborhood, setNeighborhood] = useState("")
+
   const navigate = useNavigate()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
     setError("")
+
+    if (!acceptTerms) {
+      setError("Você precisa aceitar os Termos de Uso para continuar.")
+      return
+    }
+
+    setLoading(true)
 
     const formData = new FormData(e.currentTarget)
 
@@ -44,6 +62,8 @@ export function Prestador() {
       phone: formData.get("phone") as string,
       description: formData.get("description") as string,
       category: finalCategory,
+      city,
+      neighborhood,
       role: "PROVIDER",
     }
 
@@ -62,7 +82,6 @@ export function Prestador() {
         throw new Error(err.message || "Erro ao criar conta")
       }
 
-      alert("Conta de prestador criada com sucesso")
       navigate("/")
     } catch (err: any) {
       setError(err.message)
@@ -93,28 +112,31 @@ export function Prestador() {
         </div>
 
         <div className="space-y-4">
-          <Input
-            name="name"
-            placeholder="Nome completo"
+          <Input name="name" placeholder="Nome completo" required className="rounded-xl" />
+          <Input name="email" type="email" placeholder="Email" required className="rounded-xl" />
+          <Input name="phone" placeholder="Telefone (opcional)" className="rounded-xl" />
+
+          <select
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
             required
-            className="rounded-xl"
-          />
+          >
+            <option value="">Selecione sua cidade</option>
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
 
           <Input
-            name="email"
-            type="email"
-            placeholder="Email"
-            required
+            placeholder="Bairro (ex: Cohama, Calhau, Cidade Operária)"
+            value={neighborhood}
+            onChange={(e) => setNeighborhood(e.target.value)}
             className="rounded-xl"
           />
 
-          <Input
-            name="phone"
-            placeholder="Telefone (opcional)"
-            className="rounded-xl"
-          />
-
-          {/* SELECT DE CATEGORIA */}
           <select
             required
             value={category}
@@ -129,7 +151,6 @@ export function Prestador() {
             ))}
           </select>
 
-          {/* INPUT EXTRA SE FOR "OUTROS" */}
           {category === "Outros" && (
             <Input
               name="customCategory"
@@ -152,6 +173,37 @@ export function Prestador() {
             required
             className="rounded-xl"
           />
+        </div>
+
+        <div className="flex items-start gap-2 mt-4">
+          <input
+            id="terms"
+            type="checkbox"
+            checked={acceptTerms}
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+          />
+
+          <label htmlFor="terms" className="text-sm text-muted-foreground">
+            Li e concordo com os{" "}
+            <a
+              href="/suporte/termosdeuso"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+            >
+              Termos de Uso
+            </a>{" "}
+            e a{" "}
+            <a
+              href="/suporte/politicadeprivacidade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+            >
+              Política de Privacidade
+            </a>
+          </label>
         </div>
 
         {error && (

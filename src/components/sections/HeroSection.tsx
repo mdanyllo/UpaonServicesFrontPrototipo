@@ -96,24 +96,25 @@ function handleSearch(value?: string) {
         <div className="max-w-4xl mx-auto text-center">
 
           {/* Cidade */}
-          <div className="mt-2 inline-flex items-center gap-2 bg-card/80 backdrop-blur-sm border border-border rounded-full px-4 py-2 mb-8">
+          <div className="mt-2 inline-flex items-center gap-2 bg-card/80 backdrop-blur-sm border border-border rounded-full px-4 py-2 mb-8 animate-fade-in">
             <MapPin className="w-4 h-4 text-primary" />
             <span className="text-sm text-muted-foreground">
               {cities[index].name}
             </span>
           </div>
 
-          <h1 className="font-display font-bold text-4xl md:text-6xl text-foreground mb-6">
+          <h1 className="font-display font-bold text-4xl md:text-6xl text-foreground mb-6 animate-fade-in">
             Encontre os melhores{" "}
-            <span className="text-gradient-hero">profissionais</span>
+            <span className="text-gradient-hero">profissionais</span>{" "}
+            da ilha
           </h1>
 
-          <p className="text-lg text-muted-foreground mb-10">
-            Do conserto ao cuidado, tudo que você precisa em um só lugar.
+          <p className="text-lg text-muted-foreground mb-10 animate-fade-in">
+            Conectamos você a trabalhadores qualificados para qualquer serviço. Do conserto ao cuidado, tudo que você precisa está aqui
           </p>
 
           {/* Busca */}
-          <div className="bg-card rounded-2xl p-2 shadow-large max-w-2xl mx-auto">
+          <div className="bg-card rounded-2xl p-2 shadow-large max-w-2xl mx-auto animate-fade-in">
             <div className="flex flex-col md:flex-row gap-2">
               <div className="flex-1 flex items-center gap-3 px-4">
                 <Search className="w-5 h-5 text-muted-foreground" />
@@ -140,11 +141,11 @@ function handleSearch(value?: string) {
 
           {/* Populares */}
           <div className="mt-8">
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="text-sm text-muted-foreground mb-3 animate-fade-in">
               Buscas populares:
             </p>
 
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-2 animate-fade-in">
               {["Eletricista", "Diarista", "Encanador", "Pintor", "Cuidador"].map(
                 (service) => (
                   <button
@@ -160,7 +161,7 @@ function handleSearch(value?: string) {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-16 max-w-xl mx-auto">
+          <div className="grid grid-cols-3 gap-8 mt-16 max-w-xl mx-auto animate-fade-in">
             <div>
               <p className="font-bold text-2xl">{stats?.providers ?? 0}</p>
               <p className="text-sm text-muted-foreground">Profissionais</p>

@@ -74,23 +74,18 @@ const Footer = () => {
             <h4 className="font-display font-semibold text-lg mb-4">Suporte</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
+                <a href="/suporte/centraldeajuda" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
                   Central de Ajuda
                 </a>
               </li>
               <li>
-                <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
+                <a href="/suporte/termosdeuso" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
                   Termos de Uso
                 </a>
               </li>
               <li>
-                <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
+                <a href="/suporte/politicadeprivacidade" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
                   Política de Privacidade
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">
-                  Fale Conosco
                 </a>
               </li>
             </ul>

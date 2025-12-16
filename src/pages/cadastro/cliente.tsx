@@ -7,6 +7,8 @@ export function Cliente() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const navigate = useNavigate()
+  const [acceptTerms, setAcceptTerms] = useState(false)
+
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -38,7 +40,11 @@ export function Cliente() {
         throw new Error(err.message || "Erro ao criar conta")
       }
 
-      alert("Conta criada com sucesso")
+      if (!acceptTerms) {
+      setError("Você precisa aceitar os Termos de Uso para continuar.")
+      return
+      }
+
       navigate("/")
     } catch (err: any) {
       setError(err.message)
@@ -97,6 +103,37 @@ export function Cliente() {
             required
             className="rounded-xl"
           />
+        </div>
+
+        <div className="flex items-start gap-2 mt-4">
+          <input
+            id="terms"
+            type="checkbox"
+            checked={acceptTerms}
+            onChange={(e) => setAcceptTerms(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
+          />
+
+          <label htmlFor="terms" className="text-sm text-muted-foreground">
+            Li e concordo com os{" "}
+            <a
+              href="/suporte/termosdeuso"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+            >
+              Termos de Uso
+            </a>{" "}
+            e a{" "}
+            <a
+              href="/suporte/politicadeprivacidade"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
+            >
+              Política de Privacidade
+            </a>
+          </label>
         </div>
 
         {error && (

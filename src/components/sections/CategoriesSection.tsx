@@ -12,6 +12,7 @@ import {
   Car,
   Heart
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   { icon: Wrench, name: "Reparos", count: "120+", color: "bg-primary/10 text-primary" },
@@ -29,6 +30,15 @@ const categories = [
 ];
 
 const CategoriesSection = () => {
+  const navigate = useNavigate();
+
+  function handleCategoryClick(categoryName: string) {
+    const params = new URLSearchParams();
+    params.append("category", categoryName);
+
+    navigate(`/resultados?${params.toString()}`);
+  }
+
   return (
     <section id="categorias" className="py-20 bg-background">
       <div className="container mx-auto px-4">
@@ -50,6 +60,7 @@ const CategoriesSection = () => {
           {categories.map((category, index) => (
             <button
               key={category.name}
+              onClick={() => handleCategoryClick(category.name)}
               className="group p-6 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-medium transition-all duration-300 text-center animate-fade-in"
               style={{ animationDelay: `${index * 0.05}s` }}
             >

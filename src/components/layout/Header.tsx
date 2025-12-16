@@ -58,6 +58,10 @@ const Header = () => {
             </div>
 
             {/* Mobile menu button */}
+              <Button variant="ghost" className="justify-start md:hidden" asChild>
+                <Link to="/login">Entrar</Link>
+              </Button>
+
             <button
               className="md:hidden p-2"
               onClick={() => setIsMenuOpen((s) => !s)}
@@ -103,9 +107,6 @@ const Header = () => {
             </a>
 
             <div className="flex flex-col gap-2 pt-4 border-t border-border">
-              <Button variant="ghost" className="justify-start" asChild>
-                <Link to="/login">Entrar</Link>
-              </Button>
               <Button variant="hero" size="sm" asChild>
                 <Link to="/cadastro">Cadastrar</Link>
               </Button>
