@@ -23,7 +23,7 @@ import { Categorias } from "./pages/dashboard/categorias";
 import { PrestadorDetalhes } from "./pages/perfilPrestador";
 import { Historico } from "./pages/Historico";
 import { RecoverPassword } from "./pages/RecoverPassword";
-import AdminDashboard from "./pages/admin";
+import AdminDashboard from "./pages/admin/superadmin";
 
 const queryClient = new QueryClient();
 
