@@ -218,7 +218,7 @@ export function ResultadosPesquisa() {
                     {/* Nome e Categoria */}
                     <div>
                       <h2 className="font-semibold text-lg text-foreground leading-tight">
-                        {provider.user.name}
+                        {formatText(provider.user.name)}
                       </h2>
                       <p className="text-sm text-primary font-medium mt-1">
                         {provider.category}

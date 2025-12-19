@@ -173,7 +173,7 @@ export function ClienteDashboard() {
 
       <main className="min-h-screen bg-gradient-sunset pt-20 md:pt-24 pb-6 px-4">
         {/* AJUSTE AQUI: Reduzi o space-y-8 para space-y-6 para aproximar os blocos no geral */}
-        <div className="container mx-auto max-w-6xl space-y-6 md:space-y-10">
+        <div className="container mx-auto max-w-6xl space-y-12 md:space-y-10">
 
           <section className="text-center space-y-4 md:space-y-6 animate-fade-in">
             <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-card/50 border border-white/10 text-foreground text-xs md:text-sm font-medium backdrop-blur-md shadow-sm">
@@ -206,8 +206,11 @@ export function ClienteDashboard() {
           {/* --- BLOCO DE CATEGORIAS --- */}
           <div>
              {/* AJUSTE AQUI: mb-2 deixa o texto colado nas categorias. Removi animate-fade-in duplicado */}
-            <div className="flex items-center justify-between max-w-5xl mx-auto mb-2 px-1 animate-fade-in delay-100">
-                <p className="text-xs text-center md:text-base text-muted-foreground">Categorias recomendadas</p>
+            <div className="flex items-center justify-between max-w-5xl mx-auto md:mt-15 mb-2 px-1 animate-fade-in delay-100">
+              <div className="flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                <h2 className="text-sm md:text-2xl font-bold text-foreground">Categorias</h2>
+              </div>
                 <Button variant="link" size="sm" className="h-auto p-0" onClick={() => navigate("/categorias")}>Ver todas categorias</Button>
             </div>
             
@@ -253,7 +256,7 @@ export function ClienteDashboard() {
             <div className="flex items-center justify-between mb-4 md:mb-6 px-1">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                <h2 className="text-lg md:text-2xl font-bold text-foreground">Próximos de você</h2>
+                <h2 className="text-sm md:text-2xl font-bold text-foreground">Próximos de você</h2>
               </div>
               <Button variant="link" size="sm" onClick={() => navigate("/resultados")}>Ver todos</Button>
             </div>
@@ -275,7 +278,7 @@ export function ClienteDashboard() {
                     </div>
                     
                     <div className="flex-1 min-w-0 text-left">
-                      <h4 className="font-bold text-foreground truncate text-sm md:text-base">{formatText(provider.user.name)}</h4>
+                      <h4 className="font-bold text-foreground truncate text-sm md:text-base">{formatText(provider.user.name.split(" ").slice(0, 2).join(" "))}</h4>
                       
                       <p className="text-xs text-primary font-bold mb-0.5 md:mb-1 truncate">
                         {formatText(provider.category)}

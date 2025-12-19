@@ -8,7 +8,6 @@ type Professional = {
   category: string
   description?: string
   rating?: number
-   
   user: {
     name: string
     avatarUrl?: string
@@ -50,44 +49,39 @@ const FeaturedProfessionalsSection = () => {
     loadFeatured()
   }, [])
 
-function handleViewProfile(providerId: string) {
+  function handleViewProfile(providerId: string) {
     const token = localStorage.getItem("upaon_token")
 
     if (!token) {
-      // 1. SALVA A INTENÇÃO: "O usuário queria ver o prestador X"
       localStorage.setItem("redirect_after_login", `/prestador/${providerId}`)
-      
-      // 2. Manda para o Login (ou Cadastro)
       navigate("/cadastro") 
     } else {
-      // Se já está logado, vai direto
       navigate(`/prestador/${providerId}`)
     }
   }
 
   return (
-    <section id="profissionais" className="py-20 bg-background">
+    <section id="profissionais" className="py-12 md:py-20 bg-background">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <span className="inline-block px-4 py-1.5 bg-sun/20 text-accent-foreground rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-3 py-1 md:px-4 md:py-1.5 bg-sun/20 text-accent-foreground rounded-full text-xs md:text-sm font-semibold mb-3 md:mb-4">
               Em Destaque
             </span>
-            <h2 className="font-display font-bold text-3xl md:text-4xl text-foreground mb-2">
-            {/*Profissionais bem avaliados*/} Profissionais novos na plataforma
+            <h2 className="font-display font-bold text-2xl md:text-4xl text-foreground mb-2">
+              Profissionais novos na plataforma
             </h2>
-            <p className="text-muted-foreground max-w-xl">
-              {/*Conheça alguns dos profissionais mais bem avaliados da nossa plataforma*/} Conheça os primeiros usuários da plataforma
+            <p className="text-sm md:text-base text-muted-foreground max-w-xl">
+              Conheça os primeiros usuários da plataforma
             </p>
           </div>
-          <Button variant="outline" size="lg">
-            Ver todos
-          </Button>
+          {/* Botão Ver Todos REMOVIDO aqui */}
         </div>
 
         {/* Professionals Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* MUDANÇA AQUI: grid-cols-2 força dois cards no mobile. gap-3 diminui o espaço pra caber melhor */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
           {!loading &&
             professionals.map((pro, index) => {
               const name = pro.user?.name || "Profissional"
@@ -97,15 +91,13 @@ function handleViewProfile(providerId: string) {
                   name
                 )}&background=random`
 
-              const rating =
-                typeof pro.rating === "number" ? pro.rating : 5.0
-
+              // const rating = typeof pro.rating === "number" ? pro.rating : 5.0
               const city = pro.user.city || DEFAULT_CITY
 
               return (
                 <div
                   key={pro.id}
-                  className="group bg-card rounded-2xl border border-border overflow-hidden hover:shadow-large transition-all duration-300 animate-scale-in"
+                  className="group bg-card rounded-xl md:rounded-2xl border border-border overflow-hidden hover:shadow-large transition-all duration-300 animate-scale-in flex flex-col"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Image */}
@@ -115,50 +107,51 @@ function handleViewProfile(providerId: string) {
                       alt={name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 right-3 bg-card/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
-                      <CheckCircle2 className="w-4 h-4 text-palm" />
-                      <span className="text-xs font-medium text-foreground">
+                    <div className="absolute top-2 right-2 md:top-3 md:right-3 bg-card/90 backdrop-blur-sm rounded-full px-2 py-0.5 md:px-3 md:py-1 flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-palm" />
+                      <span className="text-[10px] md:text-xs font-medium text-foreground">
                         Verificado
                       </span>
                     </div>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-5">
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="font-display font-semibold text-foreground">
-                          {name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {pro.category}
-                        </p>
+                  {/* Content - MUDANÇA: p-3 no mobile, p-5 no desktop */}
+                  <div className="p-3 md:p-5 flex flex-col flex-1 justify-between">
+                    <div>
+                      <div className="flex items-start justify-between mb-1 md:mb-2">
+                        <div className="w-full">
+                          {/* Nome menor no mobile */}
+                          <h3 className="font-display font-semibold text-sm md:text-lg text-foreground truncate">
+                            {name}
+                          </h3>
+                          <p className="text-xs md:text-sm text-muted-foreground truncate">
+                            {pro.category}
+                          </p>
+                        </div>
                       </div>
-                      {/*Mais pra frente */} {/*
-                      <div className="flex items-center gap-1 bg-sun/20 px-2 py-1 rounded-lg">
-                        <Star className="w-4 h-4 text-sun fill-sun" />
-                        <span className="text-sm font-semibold text-accent-foreground">
-                          {rating.toFixed(1)}
-                        </span>
-                      </div>*/}
+
+                      <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
+                        <MapPin className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                        <span className="truncate">{city}</span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
-                      <MapPin className="w-4 h-4" />
-                      <span>{city}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between pt-3 md:pt-4 border-t border-border gap-2 md:gap-0">
                       <div>
-                        <span className="font-display font-bold text-lg text-foreground">
+                        <span className="font-display font-bold text-sm md:text-lg text-foreground block md:inline">
                           Sob consulta
                         </span>
-                        <span className="text-sm text-muted-foreground">
-                          {" "}
-                          /serviço
+                        {/* Escondi o /serviço no mobile pra limpar a tela */}
+                        <span className="hidden md:inline text-sm text-muted-foreground">
+                          {" "}/serviço
                         </span>
                       </div>
-                      <Button onClick={() => handleViewProfile(pro.id)} variant="default" size="sm">
+                      <Button 
+                        onClick={() => handleViewProfile(pro.id)} 
+                        variant="default" 
+                        size="sm"
+                        className="w-full md:w-auto text-xs md:text-sm h-8 md:h-9"
+                      >
                         Contratar
                       </Button>
                     </div>

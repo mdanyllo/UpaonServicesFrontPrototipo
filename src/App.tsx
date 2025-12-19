@@ -15,7 +15,8 @@ import { CentralDeAjuda } from "./pages/suporte/centraldeajuda";
 import { TermosDeUso } from "./pages/suporte/termosdeuso";
 import { PoliticaDePrivacidade } from "./pages/suporte/politicadeprivacidade";
 import ProviderDashboard from "./pages/dashboard/prestador";
-import { EditProfile } from "./pages/dashboard/editarperfil";
+import { EditProfilePrestador } from "./pages/dashboard/editarPerfilPrestador";
+import { EditProfileCliente } from "./pages/dashboard/editarPerfilCliente";
 import { ClienteDashboard } from "./pages/dashboard/cliente";
 import { VerifyAccount } from "./pages/verifyAccount";
 import { Categorias } from "./pages/dashboard/categorias";
@@ -41,7 +42,8 @@ const App = () => (
           <Route path="/verificar-conta" element={<VerifyAccount />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard/prestador" element={< ProviderDashboard/>} />
-          <Route path="/dashboard/editarperfil" element={<EditProfile />} />
+          <Route path="/dashboard/prestador/perfil" element={<EditProfilePrestador />} />
+          <Route path="/dashboard/cliente/perfil" element={<EditProfileCliente />} />
           <Route path="/dashboard/cliente" element={<ClienteDashboard />} />
           <Route path="/historico" element={<Historico />} />
           <Route path="/prestador/:id" element={<PrestadorDetalhes />} />

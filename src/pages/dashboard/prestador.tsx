@@ -25,6 +25,15 @@ function formatDate(dateString: string) {
   }).format(date)
 }
 
+  function formatText(text?: string) {
+    if (!text) return ""
+    return text
+      .toLowerCase()
+      .split(" ")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ")
+  }
+
 export default function ProviderDashboard() {
   const navigate = useNavigate()
   const [user, setUser] = useState<any>(null)
@@ -119,7 +128,7 @@ export default function ProviderDashboard() {
               Painel do Prestador
             </div>
             <h1 className="font-display font-bold text-3xl md:text-4xl text-foreground">
-              Olá, <span className="text-gradient-hero">{user.name.split(" ")[0]}</span>
+              Olá, <span className="text-gradient-hero">{formatText(user.name.split(" ")[0])}</span>
             </h1>
             <p className="text-muted-foreground mt-1 flex items-center gap-2">
               <MapPin className="w-4 h-4" /> 
@@ -232,7 +241,7 @@ export default function ProviderDashboard() {
                             
                             {/* Dados do Cliente */}
                             <div className="flex-1">
-                                <h4 className="text-sm font-bold text-foreground">{log.client.name}</h4>
+                                <h4 className="text-sm font-bold text-foreground">{formatText(log.client.name)}</h4>
                                 <p className="text-xs text-muted-foreground">Clicou no botão de contato</p>
                             </div>
 
@@ -279,7 +288,7 @@ export default function ProviderDashboard() {
                     )}
                 </div>
 
-                <h3 className="font-bold text-lg">{user.name}</h3>
+                <h3 className="font-bold text-lg">{formatText(user.name)}</h3>
                 <p className="text-sm text-primary font-medium mb-4">{user.provider?.category || "Categoria não definida"}</p>
                 
                 <p className="text-sm text-muted-foreground mb-6 line-clamp-3">

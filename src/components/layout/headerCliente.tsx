@@ -62,18 +62,19 @@ const Bar = () => {
               {/* Foto (Avatar) */}
               <div className="w-9 h-9 rounded-full bg-muted overflow-hidden border border-border flex items-center justify-center">
                 {user.avatarUrl ? (
-                  <img 
-                    src={user.avatarUrl} 
-                    alt={user.name} 
-                    className="w-full h-full object-cover" 
-                  />
+                  <Link to="/dashboard/cliente/perfil">
+                    <img 
+                      src={user.avatarUrl} 
+                      alt={user.name} 
+                      className="w-full h-full object-cover" 
+                  /></Link>
                 ) : (
-                  // SE NÃO TIVER FOTO: Gera o avatar com as iniciais do user.name
+                  <Link to="/dashboard/cliente/perfil">
                   <img 
                     src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} 
                     alt={user.name} 
                     className="w-full h-full object-cover" 
-                  />
+                  /></Link>
                 )}
               </div>
 

@@ -1,16 +1,10 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { ArrowLeft, Camera, Save, User, Briefcase, Mail, Loader2, Phone } from "lucide-react" // <--- Adicionei Phone
+import { ArrowLeft, Camera, Save, User, Mail, Loader2, Phone, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input" 
 
-const CATEGORIES = [
-  "Tecnologia", "Reparos", "Limpeza", "Pintura", "Construção",
-  "Beleza", "Babá", "Cuidadores", "Culinária", "Mudança",
-  "Fotografia", "Motoristas", "Outros",
-]
-
-export function EditProfile() {
+export function EditProfileCliente() {
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
@@ -20,14 +14,15 @@ export function EditProfile() {
   const [isSaving, setIsSaving] = useState(false)
   
   // Estados do Formulário
-  const [description, setDescription] = useState("")
-  const [category, setCategory] = useState("")
-  const [phone, setPhone] = useState("") // <--- NOVO ESTADO
+  const [phone, setPhone] = useState("")
+  const [city, setCity] = useState("São Luís - MA") // Valor padrão
+  const [neighborhood, setNeighborhood] = useState("")
   
   // Estados da Imagem
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
+  // 1. Carrega os dados do Cliente
   useEffect(() => {
     const storedUser = localStorage.getItem("upaon_user")
     const storedToken = localStorage.getItem("upaon_token")
@@ -40,18 +35,18 @@ export function EditProfile() {
     try {
       const parsedUser = JSON.parse(storedUser)
 
-      if (parsedUser.role !== "PROVIDER") {
-        console.warn("Acesso negado")
-        navigate("/dashboard/cliente", { replace: true })
+      // Se for prestador tentando acessar, manda pro edit dele
+      if (parsedUser.role === "PROVIDER") {
+        navigate("/dashboard/editarperfil")
         return
       }
 
       setUser(parsedUser)
       
       // Preenche campos
-      setDescription(parsedUser.provider?.description || "")
-      setCategory(parsedUser.provider?.category || "")
-      setPhone(parsedUser.phone || "") // <--- PREENCHE O TELEFONE
+      setPhone(parsedUser.phone || "")
+      setCity(parsedUser.city || "São Luís - MA")
+      setNeighborhood(parsedUser.neighborhood || "")
       setPreviewUrl(parsedUser.avatarUrl || null)
       
       setIsLoading(false)
@@ -63,6 +58,22 @@ export function EditProfile() {
     }
   }, [navigate])
   
+  // 2. Máscara de Telefone
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let value = e.target.value
+    value = value.replace(/\D/g, "")
+    if (value.length > 11) value = value.slice(0, 11)
+    
+    if (value.length > 2) {
+      value = `(${value.slice(0, 2)}) ${value.slice(2)}`
+    }
+    if (value.length > 9) {
+      value = `${value.slice(0, 9)}-${value.slice(9)}`
+    }
+    setPhone(value)
+  }
+
+  // 3. Preview da Imagem
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) {
@@ -72,6 +83,7 @@ export function EditProfile() {
     }
   }
 
+  // 4. Salvar
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsSaving(true)
@@ -80,14 +92,16 @@ export function EditProfile() {
       const token = localStorage.getItem("upaon_token")
       const formData = new FormData()
 
-      formData.append("description", description)
-      formData.append("category", category)
-      formData.append("phone", phone) // <--- ENVIA O TELEFONE NOVO
+      // Envia os campos atualizados
+      formData.append("phone", phone)
+      formData.append("city", city)
+      formData.append("neighborhood", neighborhood)
       
       if (selectedFile) {
         formData.append("avatar", selectedFile)
       }
 
+      // Usa a mesma rota de atualização de perfil
       const res = await fetch("https://upaonservicesbackprototipo.onrender.com/users/profile", {
         method: "PATCH",
         headers: {
@@ -100,10 +114,12 @@ export function EditProfile() {
 
       const updatedUser = await res.json()
       
+      // Atualiza o localStorage com os novos dados (incluindo bairro e cidade)
       localStorage.setItem("upaon_user", JSON.stringify(updatedUser))
       setUser(updatedUser)
       
-      navigate("/dashboard/prestador")
+      // Volta para o Dashboard
+      navigate("/dashboard/cliente")
 
     } catch (error) {
       console.error(error)
@@ -142,17 +158,17 @@ export function EditProfile() {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={() => navigate("/dashboard/prestador")} 
+            onClick={() => navigate("/dashboard/cliente")} 
             className="rounded-full hover:bg-white/10"
           >
             <ArrowLeft className="w-5 h-5 text-foreground" />
           </Button>
-          <h1 className="text-xl font-bold text-foreground">Editar Perfil</h1>
+          <h1 className="text-xl font-bold text-foreground">Editar Meu Perfil</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
           
-          {/* --- SEÇÃO DA FOTO --- */}
+          {/* --- FOTO DE PERFIL --- */}
           <div className="flex flex-col items-center">
             <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
               <div className="w-32 h-32 rounded-full border-4 border-card bg-muted flex items-center justify-center overflow-hidden shadow-lg transition-transform group-hover:scale-105">
@@ -180,10 +196,10 @@ export function EditProfile() {
             
             {/* --- CAMPOS READ-ONLY --- */}
             <div className="space-y-2 opacity-70">
-              <label className="text-sm font-medium text-muted-foreground ml-1">Nome Completo</label>
+              <label className="text-sm font-medium text-muted-foreground ml-1">Nome</label>
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50 border border-border">
                 <User className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{user.name}</span>
+                <span className="text-sm font-medium truncate">{user.name}</span>
               </div>
             </div>
 
@@ -191,62 +207,61 @@ export function EditProfile() {
               <label className="text-sm font-medium text-muted-foreground ml-1">E-mail</label>
               <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-muted/50 border border-border">
                 <Mail className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">{user.email}</span>
+                <span className="text-sm font-medium truncate">{user.email}</span>
               </div>
             </div>
 
             {/* --- CAMPOS EDITÁVEIS --- */}
             
-            {/* TELEFONE / WHATSAPP (NOVO) */}
+            {/* TELEFONE */}
             <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-foreground ml-1">WhatsApp / Telefone</label>
+              <label className="text-sm font-medium text-foreground ml-1">Celular / WhatsApp</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
-                  type="text"
+                  type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ex: 98988887777"
+                  onChange={handlePhoneChange}
+                  placeholder="(98) 99999-0000"
+                  className="pl-10 rounded-xl bg-card/50"
+                  maxLength={15}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* BAIRRO (Importante para busca) */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground ml-1">Bairro</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                  placeholder="Ex: Cohab, Renascença..."
                   className="pl-10 rounded-xl bg-card/50"
                   required
                 />
               </div>
-              <p className="text-xs text-muted-foreground ml-1">
-                 Este número será usado pelos clientes para te chamar no WhatsApp.
-              </p>
             </div>
 
-            {/* CATEGORIA */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-foreground ml-1">Categoria de Serviço</label>
+            {/* CIDADE */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground ml-1">Cidade</label>
               <div className="relative">
-                <Briefcase className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  className="flex h-11 w-full rounded-xl border border-input bg-card/50 px-10 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Selecione sua categoria</option>
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Ex: São Luís - MA"
+                  className="pl-10 rounded-xl bg-card/50"
+                  required
+                />
               </div>
             </div>
 
-            {/* DESCRIÇÃO */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-foreground ml-1">Sobre você e seu trabalho</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Ex: Trabalho com elétrica há 10 anos, sou pontual e..."
-                className="flex min-h-[120px] w-full rounded-xl border border-input bg-card/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-              />
-              <p className="text-xs text-muted-foreground text-right">
-                {description.length} caracteres
-              </p>
-            </div>
           </div>
 
           {/* Footer com Ações */}
@@ -255,7 +270,7 @@ export function EditProfile() {
               type="button" 
               variant="ghost" 
               className="w-full rounded-xl"
-              onClick={() => navigate("/dashboard/prestador")}
+              onClick={() => navigate("/dashboard/cliente")}
             >
               Cancelar
             </Button>
