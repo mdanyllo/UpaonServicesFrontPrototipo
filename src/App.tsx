@@ -24,6 +24,7 @@ import { PrestadorDetalhes } from "./pages/perfilPrestador";
 import { Historico } from "./pages/Historico";
 import { RecoverPassword } from "./pages/RecoverPassword";
 import AdminDashboard from "./pages/admin/superadmin";
+import {PaymentPage } from "./pages/pagamento";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/recuperar-senha" element={<RecoverPassword />} />
           
           <Route path="/dashboard/superadmin" element={<AdminDashboard />} />
+          <Route path="/checkout/:providerId" element={<PaymentPage />} />
 
           <Route path="/dashboard/prestador" element={<ProviderDashboard/>} />
           <Route path="/dashboard/prestador/perfil" element={<EditProfilePrestador />} />

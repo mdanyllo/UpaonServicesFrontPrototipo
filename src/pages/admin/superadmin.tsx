@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { 
   Users, Briefcase, Search, Trash2, 
   ShieldCheck, Calendar, Trophy, ChevronLeft, ChevronRight, Loader2,
-  MessageCircle, // <--- NOVO ÍCONE
+  MessageCircle,
+  DollarSign, // Ícone para o card de faturamento
   LogOut
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -76,7 +77,6 @@ export default function AdminDashboard() {
 
   async function handleToggleFeatured(providerId: string, currentStatus: boolean, userName: string) {
     const token = localStorage.getItem("upaon_token")
-    // Otimistic Update
     setUsers(prev => prev.map(u => {
         if (u.provider?.id === providerId) {
             return { ...u, provider: { ...u.provider, isFeatured: !currentStatus } }
@@ -130,13 +130,19 @@ export default function AdminDashboard() {
     })
   }
 
-    function handleLogout() {
+  function formatCurrency(value: number) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value)
+  }
+
+  function handleLogout() {
     localStorage.removeItem("upaon_token")
     localStorage.removeItem("upaon_user")
     toast.success("Você saiu da conta.")
     navigate("/")
   }
-
 
   if (loading) return <div className="h-screen flex items-center justify-center bg-zinc-950 text-white">Carregando...</div>
 
@@ -150,7 +156,6 @@ export default function AdminDashboard() {
             </h1>
             <p className="text-zinc-400">Controle total da plataforma.</p>
         </div>
-        {/* Botão Logout */}
         <Button 
             variant="ghost" 
             size="icon" 
@@ -162,8 +167,8 @@ export default function AdminDashboard() {
         </Button>
       </div>
 
-      {/* STATS */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      {/* STATS - GRID COM 4 COLUNAS */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex items-center gap-4">
                 <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500"><Users /></div>
@@ -173,6 +178,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
         </div>
+
         <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex items-center gap-4">
                 <div className="p-3 bg-purple-500/10 rounded-xl text-purple-500"><Briefcase /></div>
@@ -183,7 +189,6 @@ export default function AdminDashboard() {
             </div>
         </div>
 
-        {/* --- CARD ALTERADO PARA WHATSAPP --- */}
         <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex items-center gap-4">
                 <div className="p-3 bg-green-500/10 rounded-xl text-green-500">
@@ -192,6 +197,21 @@ export default function AdminDashboard() {
                 <div>
                     <h3 className="text-3xl font-bold">{stats?.totalContacts || 0}</h3>
                     <p className="text-sm text-zinc-400">Cliques no WhatsApp</p>
+                </div>
+            </div>
+        </div>
+
+        {/* CARD FAZ-ME-RIR (RECEITA) */}
+        <div className="bg-zinc-900 border border-yellow-500/20 p-6 rounded-2xl ring-1 ring-yellow-500/10">
+            <div className="flex items-center gap-4">
+                <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500">
+                    <DollarSign />
+                </div>
+                <div>
+                    <h3 className="text-2xl font-bold text-yellow-500">
+                      {formatCurrency(stats?.revenue || 0)}
+                    </h3>
+                    <p className="text-sm text-zinc-400">Receita Total</p>
                 </div>
             </div>
         </div>

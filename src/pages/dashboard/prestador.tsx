@@ -162,6 +162,25 @@ export default function ProviderDashboard() {
   const currentRating = user.provider?.rating || 0
   const status = statusAvaliacao(currentRating)
 
+ const handleUpgrade = () => {
+  const storedUser = localStorage.getItem("upaon_user");
+  if (!storedUser) {
+    toast.error("Usuário não autenticado");
+    return;
+  }
+
+  const parsedUser = JSON.parse(storedUser);
+  const providerId = parsedUser.provider?.id;
+
+  if (!providerId) {
+    toast.error("Você precisa ser um prestador para acessar esta área.");
+    return;
+  }
+  
+  // Navega para o checkout com os dados corretos
+  navigate(`/checkout/${providerId}`);
+};
+
   return (
     <section className="relative min-h-screen pt-14 md:pt-18 pb-12 bg-gradient-sunset overflow-hidden">
       
@@ -253,7 +272,7 @@ export default function ProviderDashboard() {
 
           {/* Card 3: DESTAQUE / IMPULSIONAR (Transformado) */}
           <div 
-            onClick={() => toast.info("Funcionalidade de Destaque em breve!")} // Aqui você colocará a lógica de pagamento depois
+            onClick={handleUpgrade}
             className="relative overflow-hidden bg-gradient-to-br from-white to-orange-500/5 backdrop-blur-md border border-orange-500/20 p-6 rounded-2xl shadow-large hover:shadow-orange-500/20 transition-all duration-300 group cursor-pointer hover:scale-[1.02]"
           >
             {/* Efeito de brilho no fundo */}
