@@ -4,8 +4,10 @@ import {
   Users, Briefcase, Search, Trash2, 
   ShieldCheck, Calendar, Trophy, ChevronLeft, ChevronRight, Loader2,
   MessageCircle,
-  DollarSign, // Ícone para o card de faturamento
-  LogOut
+  DollarSign,
+  LogOut,
+  CheckCircle2, // Ícone para Ativo
+  XCircle       // Ícone para Inativo
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,7 +27,6 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const [stats, setStats] = useState<any>(null)
   
-  // PAGINAÇÃO
   const [users, setUsers] = useState<any[]>([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -91,30 +92,44 @@ export default function AdminDashboard() {
         })
         if (res.ok) {
             const formattedName = formatText(userName)
-            toast.success(!currentStatus ? `${formattedName} agora é DESTAQUE!` : `${formattedName} removido dos destaques.`)
+            toast.success(!currentStatus ? `${formattedName} agora é DESTAQUE!` : `${formattedName} removido.`)
         } else {
             loadUsers(page, searchTerm)
             toast.error("Erro ao alterar destaque.")
         }
-    } catch (err) {
-        console.error(err)
-    }
+    } catch (err) { console.error(err) }
   }
 
-  async function handleDelete(userId: string) {
-    if(!confirm("Tem certeza? Essa ação é irreversível.")) return
+async function handleDelete(userId: string, currentStatus: boolean) {
+    const actionText = currentStatus ? "desativar" : "ativar";
+    if(!confirm(`Tem certeza que deseja ${actionText} este usuário?`)) return
+    
     const token = localStorage.getItem("upaon_token")
     try {
         const res = await fetch(`${API_URL}/admin/users/${userId}/toggle-active`, {
             method: "PATCH",
             headers: { Authorization: `Bearer ${token}` }
         })
+        
         if(res.ok) {
-            toast.success("Usuário deletado.")
-            loadUsers(page, searchTerm)
+            toast.success(`Usuário ${actionText === "ativar" ? "ativado" : "desativado"} com sucesso.`)
+            
+            setUsers(prev => prev.map(u => {
+                if (u.id === userId && u.provider) {
+                    // Inverte o status de isActive baseado no que era antes
+                    return { ...u, provider: { ...u.provider, isActive: !currentStatus, isFeatured: currentStatus ? false : u.provider.isFeatured } }
+                }
+                return u
+            }))
+        } else {
+            const errorData = await res.json();
+            toast.error(`Erro do servidor: ${errorData.message || 'Erro desconhecido'}`);
         }
-    } catch(err) { console.error(err) }
-  }
+    } catch(err) { 
+        toast.error("Falha na rede ou servidor offline");
+        console.error(err);
+    }
+}
 
   function handleSearch(e: React.KeyboardEvent) {
     if(e.key === 'Enter') {
@@ -147,14 +162,14 @@ export default function AdminDashboard() {
   if (loading) return <div className="h-screen flex items-center justify-center bg-zinc-950 text-white">Carregando...</div>
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 font-sans">
       
       <div className="max-w-7xl mx-auto mt-4 mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 className="text-3xl font-bold font-display flex items-center gap-2">
                 <ShieldCheck className="text-green-500" /> Painel Super Admin
             </h1>
-            <p className="text-zinc-400">Controle total da plataforma.</p>
+            <p className="text-zinc-400">Gerenciamento de usuários e financeiro.</p>
         </div>
         <Button 
             variant="ghost" 
@@ -167,7 +182,7 @@ export default function AdminDashboard() {
         </Button>
       </div>
 
-      {/* STATS - GRID COM 4 COLUNAS */}
+      {/* STATS */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex items-center gap-4">
@@ -191,43 +206,36 @@ export default function AdminDashboard() {
 
         <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl">
             <div className="flex items-center gap-4">
-                <div className="p-3 bg-green-500/10 rounded-xl text-green-500">
-                    <MessageCircle />
-                </div>
+                <div className="p-3 bg-green-500/10 rounded-xl text-green-500"><MessageCircle /></div>
                 <div>
                     <h3 className="text-3xl font-bold">{stats?.totalContacts || 0}</h3>
-                    <p className="text-sm text-zinc-400">Cliques no WhatsApp</p>
+                    <p className="text-sm text-zinc-400">Contatos Realizados</p>
                 </div>
             </div>
         </div>
 
-        {/* CARD FAZ-ME-RIR (RECEITA) */}
         <div className="bg-zinc-900 border border-yellow-500/20 p-6 rounded-2xl ring-1 ring-yellow-500/10">
             <div className="flex items-center gap-4">
-                <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500">
-                    <DollarSign />
-                </div>
+                <div className="p-3 bg-yellow-500/10 rounded-xl text-yellow-500"><DollarSign /></div>
                 <div>
-                    <h3 className="text-2xl font-bold text-yellow-500">
-                      {formatCurrency(stats?.revenue || 0)}
-                    </h3>
+                    <h3 className="text-2xl font-bold text-yellow-500">{formatCurrency(stats?.revenue || 0)}</h3>
                     <p className="text-sm text-zinc-400">Receita Total</p>
                 </div>
             </div>
         </div>
       </div>
 
-      {/* LISTA DE USUÁRIOS */}
+      {/* TABELA */}
       <div className="max-w-7xl mx-auto bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col">
         <div className="p-6 border-b border-zinc-800 flex flex-col md:flex-row justify-between gap-4">
             <h2 className="text-xl font-bold flex items-center gap-2">
-                Gerenciar Usuários 
-                <span className="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">{totalItems} total</span>
+                Usuários da Plataforma 
+                <span className="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">{totalItems}</span>
             </h2>
             <div className="relative w-full md:w-96">
                 <Search className="absolute left-3 top-3 w-4 h-4 text-zinc-500" />
                 <Input 
-                    placeholder="Buscar..." 
+                    placeholder="Nome ou e-mail..." 
                     className="pl-10 bg-zinc-950 border-zinc-700 text-zinc-200"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
@@ -248,8 +256,8 @@ export default function AdminDashboard() {
                     <tr>
                         <th className="px-6 py-4">Usuário</th>
                         <th className="px-6 py-4">Cadastro</th>
-                        <th className="px-6 py-4">Role</th>
-                        <th className="px-6 py-4 text-center">Destaque?</th>
+                        <th className="px-6 py-4 text-center">Status</th>
+                        <th className="px-6 py-4 text-center">Destaque</th>
                         <th className="px-6 py-4 text-right">Ações</th>
                     </tr>
                 </thead>
@@ -272,16 +280,30 @@ export default function AdminDashboard() {
                                     {formatDate(u.createdAt)}
                                 </div>
                             </td>
-                            <td className="px-6 py-4">
-                                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                    u.role === 'ADMIN' ? 'bg-red-500/10 text-red-500' : 
-                                    u.role === 'PROVIDER' ? 'bg-purple-500/10 text-purple-500' : 
-                                    'bg-zinc-800 text-zinc-400'
-                                }`}>
-                                    {u.role}
-                                </span>
+
+                            <td className="px-6 py-4 text-center">
+                                {u.role === 'PROVIDER' && u.provider ? (
+                                    <div className="flex flex-col items-center gap-1">
+                                        {u.provider.isActive ? (
+                                            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20 uppercase">
+                                                <CheckCircle2 className="w-3.5 h-3.5" /> Ativo
+                                            </span>
+                                        ) : (
+                                            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20 uppercase">
+                                                <XCircle className="w-3.5 h-3.5" /> Inativo
+                                            </span>
+                                        )}
+                                        {u.provider.isActive && u.provider.activatedUntil && (
+                                            <span className="text-[10px] text-zinc-600">
+                                                Expira: {formatDate(u.provider.activatedUntil)}
+                                            </span>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <span className="px-2 py-1 bg-zinc-800 rounded text-[10px] text-zinc-500">CLIENTE</span>
+                                )}
                             </td>
-                            
+
                             <td className="px-6 py-4 text-center">
                                 {u.role === 'PROVIDER' && u.provider ? (
                                     <Button
@@ -289,24 +311,25 @@ export default function AdminDashboard() {
                                         size="sm"
                                         onClick={() => handleToggleFeatured(u.provider.id, u.provider.isFeatured, u.name)}
                                         className={`hover:bg-yellow-500/10 ${u.provider.isFeatured ? 'text-yellow-500' : 'text-zinc-600 opacity-30 hover:opacity-100'}`}
-                                        title={u.provider.isFeatured ? "Remover Destaque" : "Destacar na Home"}
                                     >
                                         <Trophy className={`w-5 h-5 ${u.provider.isFeatured ? 'fill-yellow-500' : ''}`} />
                                     </Button>
-                                ) : (
-                                    <span className="text-zinc-700">-</span>
-                                )}
+                                ) : <span className="text-zinc-700">-</span>}
                             </td>
 
                             <td className="px-6 py-4 text-right">
                                 {u.role !== 'ADMIN' && (
                                     <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="text-zinc-500 hover:text-red-500 hover:bg-red-500/10"
-                                        onClick={() => handleDelete(u.id)}
+                                        variant="ghost" size="icon" 
+                                        // ALTERAÇÃO DINÂMICA DO BOTÃO DE AÇÃO
+                                        className={u.provider?.isActive 
+                                          ? "text-zinc-500 hover:text-red-500 hover:bg-red-500/10" 
+                                          : "text-zinc-500 hover:text-green-500 hover:bg-green-500/10"
+                                        }
+                                        onClick={() => handleDelete(u.id, u.provider?.isActive ?? false)}
+                                        title={u.provider?.isActive ? "Desativar Usuário" : "Ativar Usuário"}
                                     >
-                                        <Trash2 className="w-4 h-4" />
+                                        {u.provider?.isActive ? <Trash2 className="w-4 h-4" /> : <CheckCircle2 className="w-4 h-4" />}
                                     </Button>
                                 )}
                             </td>
@@ -317,31 +340,26 @@ export default function AdminDashboard() {
         </div>
 
         <div className="p-4 border-t border-zinc-800 flex items-center justify-between bg-zinc-900">
-            <span className="md:text-sm text-xs text-zinc-500">
-                Página {page} de {totalPages}
-            </span>
+            <span className="text-xs text-zinc-500">Página {page} de {totalPages}</span>
             <div className="flex gap-2">
                 <Button 
-                    variant="outline" 
-                    size="sm" 
+                    variant="outline" size="sm" 
                     onClick={() => loadUsers(page - 1, searchTerm)}
                     disabled={page === 1}
-                    className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+                    className="border-zinc-700 text-zinc-300"
                 >
                     <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
                 </Button>
                 <Button 
-                    variant="outline" 
-                    size="sm" 
+                    variant="outline" size="sm" 
                     onClick={() => loadUsers(page + 1, searchTerm)}
                     disabled={page >= totalPages}
-                    className="border-zinc-700 text-zinc-300 hover:bg-zinc-800"
+                    className="border-zinc-700 text-zinc-300"
                 >
                     Próximo <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
             </div>
         </div>
-
       </div>
     </div>
   )
