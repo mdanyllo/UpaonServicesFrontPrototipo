@@ -42,30 +42,32 @@ const onSubmit = async ({ formData }: any) => {
     
     const { status, ticket_url } = response.data;
 
-    // Se o status for aprovado, não esperamos nada, apenas limpamos e saímos
     if (status === 'approved') {
       toast.success("Pagamento aprovado!");
-      
-      // Removemos qualquer chance do Brick travar a execução limpando a tela
-      document.body.style.opacity = "0.5"; 
-      
-      // O assign força a troca de página em nível de browser
       window.location.assign("/dashboard/prestador");
-      return; 
     } 
-    
-    if (status === 'pending' || status === 'in_process') {
-      if (ticket_url) {
-        window.location.assign(ticket_url);
+    else if (status === 'pending' || status === 'in_process') {
+      
+      if (type === 'ACTIVATION' || type === 'FEATURED') {
+        toast.success("Pagamento gerado! Aguardando confirmação...");
+        
+        if (ticket_url) {
+          window.open(ticket_url, '_blank');
+        }
+
+        setTimeout(() => {
+          window.location.assign("/dashboard/prestador");
+        }, 2000);
       }
-    } else {
-      toast.error("Pagamento recusado ou erro no processamento.");
+    } 
+    else {
+      toast.error("Pagamento recusado.");
     }
-  } catch (error: any) {
-    console.error('Erro:', error);
+  } catch (error) {
+    console.error(error);
     toast.error("Erro na comunicação com o servidor.");
   }
-};  
+};
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
