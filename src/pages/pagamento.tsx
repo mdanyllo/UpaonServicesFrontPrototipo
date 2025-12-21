@@ -1,6 +1,6 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { initMercadoPago, Payment as PaymentBrick } from '@mercadopago/sdk-react';
-import { Home, ArrowLeft } from "lucide-react"
+import { Home, ArrowLeft, TriangleAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import axios from 'axios';
 import { API_URL } from '@/config/api';
@@ -72,6 +72,9 @@ const onSubmit = async ({ formData }: any) => {
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold mb-4 text-orange-500">
           {type === 'ACTIVATION' ? 'Ativar Sua Conta' : 'Destacar Seu Perfil'}
+          <div className='flex justify-center items-center mt-1'>
+            <p className='md:text-sm text-xs font-normal'>Ao realizar o pagamento volte para o seu perfil na plataforma</p>
+          </div>
         </h1>
         <div className="bg-white p-6 rounded-2xl shadow-lg border inline-block min-w-[280px]">
           <p className="text-sm text-gray-500 uppercase font-bold mb-2">Total a pagar</p>
