@@ -94,22 +94,18 @@ const onSubmit = async ({ formData }: any) => {
       }}
       onSubmit={onSubmit}
       onReady={() => {
-        // Esse "vigia" roda tanto para Cartão quanto para Pix
-        const checkSuccess = setInterval(() => {
-          // Procura por elementos que o Mercado Pago cria apenas na tela de sucesso
-          const hasSuccess = document.querySelector('.mp-status-container') || 
-                            document.querySelector('.mercadopago-button--success') ||
-                            document.querySelector('.status-main-title'); // Título "Pronto, seu pagamento foi aprovado"
+        // Esse código RODA SIM, mesmo com @ts-ignore nas linhas acima
+        const monitor = setInterval(() => {
+          // Procuramos qualquer texto ou classe de sucesso que o MP injeta na tela
+          const textoSucesso = document.body.innerText.includes("sucesso") || 
+                              document.body.innerText.includes("aprovado") ||
+                              document.querySelector('.mp-status-container');
 
-          if (hasSuccess) {
-            clearInterval(checkSuccess);
-            // Redirecionamento forçado
+          if (textoSucesso) {
+            clearInterval(monitor);
             window.location.href = "/dashboard/prestador";
           }
-        }, 1000); // Checa a cada 1 segundo
-
-        // Limpa o intervalo se o usuário sair da página por conta própria
-        return () => clearInterval(checkSuccess);
+        }, 2000);
       }}
     />
     </div>
