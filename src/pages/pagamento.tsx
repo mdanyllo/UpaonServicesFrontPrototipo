@@ -44,20 +44,19 @@ const onSubmit = async ({ formData }: any) => {
 
     if (status === 'approved') {
       toast.success("Pagamento aprovado!");
-      window.location.assign("/dashboard/prestador");
+      window.location.href = "/dashboard/prestador";
     } 
     else if (status === 'pending' || status === 'in_process') {
-      
-      if (type === 'ACTIVATION' || type === 'FEATURED') {
-        toast.success("Pagamento gerado! Aguardando confirmação...");
-        
-        if (ticket_url) {
-          window.open(ticket_url, '_blank');
-        }
-
+      if (ticket_url) {
+        toast.info("Redirecionando para o pagamento...");
+        // REDIRECIONAMENTO DIRETO (Evita bloqueio de pop-up)
         setTimeout(() => {
-          window.location.assign("/dashboard/prestador");
-        }, 2000);
+          window.location.href = ticket_url;
+        }, 1000);
+      } else {
+        // Se for cartão em análise (sem ticket_url), volta pro painel
+        toast.info("Pagamento em análise. Aguarde a liberação.");
+        window.location.href = "/dashboard/prestador";
       }
     } 
     else {
