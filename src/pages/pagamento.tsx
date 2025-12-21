@@ -35,46 +35,37 @@ export const PaymentPage = () => {
   )}
 
 const onSubmit = async ({ formData }: any) => {
-    try {
-      const response = await axios.post(`${API_URL}/payment`, { 
-        formData, providerId, type, amount: amountUrl
-      });
+  try {
+    const response = await axios.post(`${API_URL}/payment`, { 
+      formData, providerId, type, amount: amountUrl
+    });
+    
+    const { status, ticket_url } = response.data;
+
+    // Se o status for aprovado, não esperamos nada, apenas limpamos e saímos
+    if (status === 'approved') {
+      toast.success("Pagamento aprovado!");
       
-      const { status, status_detail, ticket_url } = response.data;
-
-      if (status === 'approved') {
-        toast.success("Pagamento aprovado com sucesso! Redirecionando...");
-        
-        // Substituímos o navigate/href comum por um replace de janela
-        // Isso força o navegador a mudar de página mesmo com o Brick ativo
-        setTimeout(() => {
-          window.location.replace("/dashboard/prestador");
-        }, 1000);
-
-      } else if (status === 'pending' || status === 'in_process') {
-        toast.success("Pagamento pendente! Redirecionando para o comprovante...");
-        if (ticket_url) {
-          setTimeout(() => {
-            window.location.replace(ticket_url);
-          }, 1000);
-        }
-      } else if (status === 'rejected') {
-        const erros: any = {
-          'cc_rejected_bad_filled_card_number': "Número do cartão inválido.",
-          'cc_rejected_bad_filled_date': "Data de validade incorreta.",
-          'cc_rejected_bad_filled_other': "Dados do cartão incorretos.",
-          'cc_rejected_insufficient_amount': "Saldo insuficiente.",
-        };
-        toast.error(erros[status_detail] || "Pagamento recusado pelo Mercado Pago.");
-      } else {
-        toast.error("Ocorreu um problema com o seu pagamento.");
+      // Removemos qualquer chance do Brick travar a execução limpando a tela
+      document.body.style.opacity = "0.5"; 
+      
+      // O assign força a troca de página em nível de browser
+      window.location.assign("/dashboard/prestador");
+      return; 
+    } 
+    
+    if (status === 'pending' || status === 'in_process') {
+      if (ticket_url) {
+        window.location.assign(ticket_url);
       }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Erro de conexão com o servidor.";
-      toast.error(msg);
-      console.error('Erro Front:', error);
+    } else {
+      toast.error("Pagamento recusado ou erro no processamento.");
     }
-  };
+  } catch (error: any) {
+    console.error('Erro:', error);
+    toast.error("Erro na comunicação com o servidor.");
+  }
+};  
 
   return (
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
@@ -91,9 +82,24 @@ const onSubmit = async ({ formData }: any) => {
       </div>
 
       <PaymentBrick
-        initialization={{ amount: amountUrl }}
-        customization={{ paymentMethods: { bankTransfer: ["all"], creditCard: ["all"], debitCard: ["all"] } }}
+        initialization={{ 
+            amount: amountUrl 
+          }}
+          customization={{
+            paymentMethods: {
+              bankTransfer: ['all'],
+              creditCard: ['all'],
+              debitCard: ['all'],
+            },
+            visual: {
+              // @ts-ignore
+              preserveLayout: true,
+              // @ts-ignore
+              showStatusScreen: false, 
+            } as any 
+          }}
         onSubmit={onSubmit}
+        onError={(error) => console.error("Erro no Brick:", error)}
       />
     </div>
   );
