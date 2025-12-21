@@ -81,26 +81,37 @@ const onSubmit = async ({ formData }: any) => {
         </div>
       </div>
 
-      <PaymentBrick
-        initialization={{ 
-            amount: amountUrl 
-          }}
-          customization={{
-            paymentMethods: {
-              bankTransfer: ['all'],
-              creditCard: ['all'],
-              debitCard: ['all'],
-            },
-            visual: {
-              // @ts-ignore
-              preserveLayout: true,
-              // @ts-ignore
-              showStatusScreen: false, 
-            } as any 
-          }}
-        onSubmit={onSubmit}
-        onError={(error) => console.error("Erro no Brick:", error)}
-      />
+    <PaymentBrick
+      initialization={{ amount: amountUrl }}
+      customization={{ 
+        paymentMethods: { bankTransfer: ["all"], creditCard: ["all"], debitCard: ["all"] },
+        visual: {
+          // @ts-ignore
+          preserveLayout: true,
+          // @ts-ignore
+          showStatusScreen: false, 
+        }
+      }}
+      onSubmit={onSubmit}
+      onReady={() => {
+        // Esse "vigia" roda tanto para Cartão quanto para Pix
+        const checkSuccess = setInterval(() => {
+          // Procura por elementos que o Mercado Pago cria apenas na tela de sucesso
+          const hasSuccess = document.querySelector('.mp-status-container') || 
+                            document.querySelector('.mercadopago-button--success') ||
+                            document.querySelector('.status-main-title'); // Título "Pronto, seu pagamento foi aprovado"
+
+          if (hasSuccess) {
+            clearInterval(checkSuccess);
+            // Redirecionamento forçado
+            window.location.href = "/dashboard/prestador";
+          }
+        }, 1000); // Checa a cada 1 segundo
+
+        // Limpa o intervalo se o usuário sair da página por conta própria
+        return () => clearInterval(checkSuccess);
+      }}
+    />
     </div>
   );
 };
