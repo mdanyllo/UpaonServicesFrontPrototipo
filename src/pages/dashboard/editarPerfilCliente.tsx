@@ -57,6 +57,21 @@ export function EditProfileCliente() {
       navigate("/login")
     }
   }, [navigate])
+
+  // Lógica de Regex para Máscara de Telefone
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length <= 11) {
+      value = value.replace(/^(\d{0,2})(\d{0,5})(\d{0,4})/, (match, p1, p2, p3) => {
+        let res = "";
+        if (p1) res += `(${p1}`;
+        if (p2) res += `) ${p2}`;
+        if (p3) res += `-${p3}`;
+        return res;
+      });
+      setPhone(value);
+    }
+  };
   
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -68,6 +83,14 @@ export function EditProfileCliente() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    // Validação do Telefone
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 10) {
+      toast.error("Por favor, insira um telefone válido com DDD.");
+      return;
+    }
+
     setIsSaving(true)
 
     try {
@@ -134,7 +157,13 @@ export function EditProfileCliente() {
                     <label className="text-sm font-medium">Telefone / WhatsApp</label>
                     <div className="relative">
                         <Phone className="absolute left-3 top-2.5 w-5 h-5 text-muted-foreground" />
-                        <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(98) 99999-9999" className="pl-10"/>
+                        <Input 
+                          type="tel"
+                          value={phone} 
+                          onChange={handlePhoneChange} 
+                          placeholder="(98) 99999-9999" 
+                          className="pl-10"
+                        />
                     </div>
                 </div>
                  

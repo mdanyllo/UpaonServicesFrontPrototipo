@@ -22,7 +22,6 @@ export function EditProfilePrestador() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   
-  
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [category, setCategory] = useState("")
@@ -44,7 +43,6 @@ export function EditProfilePrestador() {
 
     try {
       const parsedUser = JSON.parse(storedUser)
-      // Se não for prestador, manda pro cliente
       if (parsedUser.role !== "PROVIDER") {
         navigate("/dashboard/cliente/perfil")
         return
@@ -64,6 +62,21 @@ export function EditProfilePrestador() {
       navigate("/login")
     }
   }, [navigate])
+
+  // Lógica de Regex para Máscara de Telefone
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+    if (value.length <= 11) {
+      value = value.replace(/^(\={0,2})(\d{0,2})(\d{0,5})(\d{0,4})/, (match, p1, p2, p3, p4) => {
+        let res = "";
+        if (p2) res += `(${p2}`;
+        if (p3) res += `) ${p3}`;
+        if (p4) res += `-${p4}`;
+        return res;
+      });
+      setPhone(value);
+    }
+  };
   
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -75,17 +88,22 @@ export function EditProfilePrestador() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    // Validação do Telefone (mínimo de caracteres para ser válido)
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 10) {
+      toast.error("Por favor, insira um telefone válido com DDD.");
+      return;
+    }
+
     setIsSaving(true)
 
     try {
       const token = localStorage.getItem("upaon_token")
       const formData = new FormData()
 
-      // DADOS DE PRESTADOR
       formData.append("description", description)
       formData.append("category", category)
-      
-      // DADOS COMUNS
       formData.append("name", name)
       formData.append("phone", phone)
       formData.append("city", city)
@@ -166,11 +184,17 @@ export function EditProfilePrestador() {
                         />
                     </div>
                 </div>
-                 <div>
+                  <div>
                     <label className="text-sm font-medium">Telefone / WhatsApp</label>
                     <div className="relative">
                         <Phone className="absolute left-3 top-2.5 w-5 h-5 text-muted-foreground" />
-                        <Input value={phone} onChange={e => setPhone(e.target.value)} className="pl-10" />
+                        <Input 
+                          type="tel"
+                          value={phone} 
+                          onChange={handlePhoneChange} 
+                          placeholder="(99) 99999-9999"
+                          className="pl-10" 
+                        />
                     </div>
                 </div>
                 
