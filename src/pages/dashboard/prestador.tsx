@@ -17,7 +17,8 @@ import {
   Zap,
   Lock,
   Shield,
-  ArrowLeft
+  ArrowLeft,
+  CircleAlert
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -158,61 +159,10 @@ export default function ProviderDashboard() {
     <section className="relative min-h-screen pt-14 md:pt-18 pb-12 bg-gradient-sunset overflow-hidden">
       
       {(user.isActivated === false || user.provider?.isActive === false) && (
-        <div className="fixed inset-0 z-[9999] bg-background/60 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-500">
-          <div className="w-full max-w-md bg-card border-2 border-primary/20 rounded-3xl p-8 shadow-2xl text-center space-y-6 animate-in zoom-in-95 duration-300">
-              <div className="w-1">
-                <a onClick={() => {localStorage.removeItem("upaon_token");localStorage.removeItem("upaon_user"); window.location.href = "/";}} className="text-zinc-800 hover:bg-white/20 cursor-pointer animate-fade-in">
-                  <ArrowLeft /> Voltar
-                </a>
-            </div>
-            <div className="bg-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 relative">
-              <ShieldCheck className="w-10 h-10 text-primary animate-pulse" />
-              <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping opacity-20" />
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold font-display text-foreground">
-                Autenticação de Segurança
-              </h2>
-              <p className="text-muted-foreground text-sm leading-relaxed px-2">
-                Nossa plataforma utiliza <span className="text-foreground font-semibold">autenticação financeira</span> para validar sua identidade. Isso garante que apenas profissionais reais e comprometidos acessem nossa base de clientes.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 flex items-center justify-between border border-border group hover:border-primary/30 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Lock className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-sm font-medium">Taxa de Ativação e Autenticação</span>
-              </div>
-              <span className="text-xl font-bold text-gradient-hero">R$ 1,99</span>
-            </div>
-
-            <div className="space-y-4">
-              <Button 
-                onClick={() => navigate(`/checkout/${user.provider?.id}?type=ACTIVATION&amount=1.99`)}
-                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-2"
-              >
-                AUTENTICAR E ATIVAR CONTA
-                <Zap className="w-4 h-4 fill-white" />
-              </Button>
-              
-              <div className="flex flex-col items-center gap-3">
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-                  Liberação imediata pós-autenticação
-                </p>
-                <div className="flex items-center justify-center gap-3 opacity-60">
-                  <img 
-                    src="/mpblue.svg" 
-                    alt="Mercado Pago" 
-                    className="h-9 w-auto" 
-                  />
-                  <span className="text-[10px] border-l border-zinc-400 pl-3">Ambiente 100% Criptografado</span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col justify-center items-center text-xs md:text-sm font-display mb-10 md:mb-6 gap-2">
+          <p ><strong><CircleAlert className="w-6 h-5 inline"/>Seu perfil está pronto! Só falta ativar.</strong></p>
+          <p className="text-center mb-2">Para proteger sua identidade e manter a plataforma segura, utilizamos uma <strong>Verificação Financeira Mensal</strong> de apenas R$ 1,99. <br /> Enquanto a conta não estiver ativa, seu perfil permanece invisível para os clientes.</p>
+          <Button className="text-xs md:text-sm" onClick={() => navigate(`/checkout/${user.provider?.id}?type=ACTIVATION&amount=1.99`)}>Ative sua conta agora mesmo</Button>
         </div>
       )}
 
@@ -229,7 +179,7 @@ export default function ProviderDashboard() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
               </span>
-              Painel do Prestador
+                {user.isActivated === true || user.provider?.isActive === true ? "Perfil Visível Para Clientes" : "Perfil Invisível Para lientes"}
             </div>
             
             {/* SAUDAÇÃO COM SELOS DE DESTAQUE LÁ EM CIMA */}
