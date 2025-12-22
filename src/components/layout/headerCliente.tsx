@@ -56,9 +56,9 @@ const Bar = () => {
 
             <a className="font-display text-xs  md:text-sm" target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLScm2aVr4RevWGH2UGPDiw0eLKnLgTlX0G034aJVI9zJfkD8dA/viewform?usp=dialog">Avalie-nos</a>
             
-            <div className="flex items-center gap-3 pl-4 border-l border-border/50">
+            <div className="flex items-center md:gap-3 pl-4 border-l border-border/50">
               {/* Nome do Usuário */}
-              <span className="text-sm font-medium text-foreground hidden sm:block">
+              <span className="text-sm font-medium font-display text-foreground hidden sm:block">
                 {firstName}
               </span>
               

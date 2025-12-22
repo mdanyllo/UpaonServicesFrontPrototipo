@@ -171,6 +171,12 @@ async function handleDelete(userId: string, currentStatus: boolean) {
             </h1>
             <p className="text-zinc-400">Gerenciamento de usuários e financeiro.</p>
         </div>
+        <div className="flex items-center gap-2">
+        <Button className="bg-zinc-900"
+                onClick={() => navigate("/dashboard/superadmin/mapa")}
+        >
+            Ver mapa de calor 🗺️
+        </Button>
         <Button 
             variant="ghost" 
             size="icon" 
@@ -180,6 +186,7 @@ async function handleDelete(userId: string, currentStatus: boolean) {
             >
             <LogOut className="w-5 h-5" />
         </Button>
+        </div>
       </div>
 
       {/* STATS */}

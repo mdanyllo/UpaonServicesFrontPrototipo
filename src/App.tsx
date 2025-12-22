@@ -26,6 +26,7 @@ import { RecoverPassword } from "./pages/RecoverPassword";
 import AdminDashboard from "./pages/admin/superadmin";
 import {PaymentPage } from "./pages/pagamento";
 import { Destaque } from "./pages/destacar";
+import { MapaCalorAdmin } from "./pages/admin/mapadecalor";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/recuperar-senha" element={<RecoverPassword />} />
           
           <Route path="/dashboard/superadmin" element={<AdminDashboard />} />
+          <Route path="/dashboard/superadmin/mapa" element={<MapaCalorAdmin />} />
           <Route path="/checkout/:providerId" element={<PaymentPage />} />
 
           <Route path="/dashboard/prestador" element={<ProviderDashboard/>} />

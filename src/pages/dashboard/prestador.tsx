@@ -326,6 +326,7 @@ export default function ProviderDashboard() {
 
                 <p className="text-sm text-primary font-medium mb-4">{user.provider?.category || "Categoria não definida"}</p>
                 <p className="text-sm text-muted-foreground mb-6 line-clamp-3">
+                  <p className="whitespace-pre-wrap"></p>
                   {user.provider?.description || "Adicione uma descrição para atrair mais clientes."}
                 </p>
                 <div className="w-full flex justify-center">

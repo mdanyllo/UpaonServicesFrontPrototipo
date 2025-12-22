@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import { API_URL } from "@/config/api"
+import { toast } from "sonner"
 
 const cities = [
   "São Luís - MA",
@@ -15,22 +16,61 @@ const cities = [
 export function Cliente() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [phone, setPhone] = useState("") // Estado para o telefone
+  const [phone, setPhone] = useState("")
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [city, setCity] = useState("")
+  const [neighborhood, setNeighborhood] = useState("")
   const [acceptTerms, setAcceptTerms] = useState(false)
   const navigate = useNavigate()
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value;
-    // Remove tudo que não é número
     value = value.replace(/\D/g, "");
-    // Aplica a formatação (99) 99999-9999
     value = value.replace(/(\d{2})(\d)/, "($1) $2");
     value = value.replace(/(\d{5})(\d)/, "$1-$2");
-
     if (value.length > 15) value = value.substring(0, 15);
-
     setPhone(value);
   };
+
+  // FUNÇÃO PARA BUSCAR CEP E COORDENADAS
+const handleCEPBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+  const cep = e.target.value.replace(/\D/g, '');
+
+  if (cep.length === 8) {
+    try {
+      const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${cep}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        const cityFromApi = `${data.city} - ${data.state}`;
+
+    
+        if (cities.includes(cityFromApi)) {
+          setCity(cityFromApi);
+          setNeighborhood(data.neighborhood || "");
+
+        
+          if (data.location && data.location.coordinates) {
+            setLatitude(data.location.coordinates.latitude);
+            setLongitude(data.location.coordinates.longitude);
+          }
+          toast.success("Endereço localizado e preenchido!");
+        } else {
+   
+          setCity("");
+          setNeighborhood("");
+          toast.error("No momento, a Upaon atende apenas na Grande São Luís.");
+        }
+      } else {
+        toast.error("CEP não encontrado. Verifique os números.");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+      toast.error("Erro ao conectar com o serviço de CEP.");
+    }
+  }
+};
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -58,9 +98,11 @@ export function Cliente() {
       name: formData.get("name") as string,
       email: email,
       password: password,
-      phone: phone.replace(/\D/g, ""), // Envia apenas os números para o banco
-      city: formData.get("city") as string,  
-      neighborhood: formData.get("neighborhood") as string,
+      phone: phone.replace(/\D/g, ""),
+      city: city, 
+      neighborhood: neighborhood, 
+      latitude: latitude, 
+      longitude: longitude, 
       role: "CLIENT",
     }
 
@@ -139,23 +181,37 @@ export function Cliente() {
             className="rounded-xl"
           />
 
+        
+          <Input
+            name="cep"
+            placeholder="CEP (Preenchimento automático)"
+            onBlur={handleCEPBlur}
+            maxLength={9}
+            className="rounded-xl border-primary/30"
+          />
+
           <select
             name="city"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
             required
           >
             <option value="">Selecione sua cidade</option>
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
+            {cities.map((c) => (
+              <option key={c} value={c}>
+                {c}
               </option>
             ))}
           </select>
 
           <Input
             name="neighborhood"
+            value={neighborhood}
+            onChange={(e) => setNeighborhood(e.target.value)}
             placeholder="Bairro (ex: Cohama, Calhau)"
             className="rounded-xl"
+            required
           />
 
           <Input

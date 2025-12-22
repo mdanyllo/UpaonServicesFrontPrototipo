@@ -77,17 +77,21 @@ export function PrestadorDetalhes() {
         }).catch(err => console.error("Erro ao salvar metrica", err))
     }
 
-    const cleanPhone = provider.user.phone.replace(/\D/g, "")
-    const finalPhone = cleanPhone.length <= 11 ? `55${cleanPhone}` : cleanPhone
+    // CORREÇÃO DO TELEFONE: Remove tudo que não é número e garante o prefixo 55 sem duplicar
+    let cleanPhone = provider.user.phone.replace(/\D/g, "")
+    if (cleanPhone.startsWith("0")) cleanPhone = cleanPhone.substring(1)
+    const finalPhone = cleanPhone.startsWith("55") ? cleanPhone : `55${cleanPhone}`
+    
     const message = `Olá ${provider.user.name}, vi seu perfil na UpaonServices e gostaria de fazer um orçamento.`
     const url = `https://wa.me/${finalPhone}?text=${encodeURIComponent(message)}`
 
     setIsRedirecting(true)
 
+    // Reduzido para 2 segundos para evitar bloqueio de popup do navegador
     setTimeout(() => {
-        window.open(url, "_blank")
+        window.location.href = url
         setIsRedirecting(false)    
-    }, 4000) 
+    }, 2000) 
   }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-white bg-gradient-sunset">Carregando...</div>
@@ -120,7 +124,7 @@ export function PrestadorDetalhes() {
             </span>
 
             <div className="w-64 h-2 bg-black/20 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
-                <div className="h-full bg-gradient-to-r from-orange-400 to-orange-600 animate-[progress_4s_ease-in-out_forwards]" style={{ width: '0%' }} />
+                <div className="h-full bg-gradient-to-r from-orange-400 to-orange-600 animate-[progress_2s_ease-in-out_forwards]" style={{ width: '0%' }} />
                 <style>{`
                     @keyframes progress {
                         0% { width: 0%; }
@@ -161,7 +165,6 @@ export function PrestadorDetalhes() {
               <div>
                 <h1 className="text-3xl font-bold text-foreground mb-1">{formatText(providerName)}</h1>
                 
-                {/* LÓGICA DE SELOS NO PERFIL */}
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <p className="text-primary font-bold text-lg">{provider.category}</p>
                   
@@ -189,7 +192,9 @@ export function PrestadorDetalhes() {
               </div>
 
               <div className="bg-background/50 rounded-xl p-4 text-sm text-muted-foreground leading-relaxed border border-white/5">
-                {provider.description || "Este profissional oferece serviços especializados na categoria, mas ainda não adicionou uma descrição detalhada."}
+                <p className="whitespace-pre-wrap">
+                    {provider.description || "Este profissional oferece serviços especializados na categoria, mas ainda não adicionou uma descrição detalhada."}
+                </p>
               </div>
 
               <div className="pt-2">

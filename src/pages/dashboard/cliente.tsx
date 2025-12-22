@@ -10,7 +10,18 @@ import { Input } from "@/components/ui/input"
 import Bar from "@/components/layout/headerCliente"
 import { API_URL } from "@/config/api"
 
-// Lista estendida para permitir a alternância (shuffle)
+// FUNÇÃO MATEMÁTICA PARA CÁLCULO DE DISTÂNCIA
+function getDistanceInKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 const ALL_QUICK_CATEGORIES = [
   { name: "Tecnologia", icon: Zap, color: "text-yellow-500", bg: "bg-yellow-500/10" },
   { name: "Reparos", icon: Wrench, color: "text-blue-500", bg: "bg-blue-500/10" },
@@ -44,12 +55,15 @@ type Provider = {
   id: string
   category: string
   rating: number
-  isFeatured: boolean // <--- Adicionado
+  isFeatured: boolean
+  distanceInKm?: string // Novo campo opcional para exibição
   user: {
     name: string
     avatarUrl?: string | null
     city: string
     neighborhood?: string 
+    latitude?: number // Adicionado para cálculo
+    longitude?: number // Adicionado para cálculo
   }
 }
 
@@ -60,7 +74,6 @@ export function ClienteDashboard() {
   const [searchText, setSearchText] = useState("")
   const [historyCount, setHistoryCount] = useState(0)
 
-  // LÓGICA DE ALTERNÂNCIA DE CATEGORIAS (Shuffle)
   const quickCategories = useMemo(() => {
     return [...ALL_QUICK_CATEGORIES]
       .sort(() => Math.random() - 0.5)
@@ -94,18 +107,41 @@ export function ClienteDashboard() {
         const params = new URLSearchParams()
         if (user.city) params.append("city", user.city)
         if (user.neighborhood) params.append("neighborhood", user.neighborhood)
-        params.append("limit", "6")
+        params.append("limit", "15") // Aumentado o limite para filtrar no front depois
 
         const res = await fetch(`${API_URL}/providers?${params.toString()}`)
         const responseData = await res.json()
-
+        
+        let providersList: Provider[] = []
         if (Array.isArray(responseData)) {
-            setNearbyProviders(responseData)
+          providersList = responseData
         } else if (responseData && Array.isArray(responseData.data)) {
-            setNearbyProviders(responseData.data)
-        } else {
-            setNearbyProviders([])
+          providersList = responseData.data
         }
+
+        // --- DUPLA VERIFICAÇÃO: FILTRO POR RAIO (HAVERSINE) ---
+        if (user.latitude && user.longitude) {
+          const filteredByDistance = providersList.map(p => {
+            if (p.user.latitude && p.user.longitude) {
+              const distance = getDistanceInKm(
+                user.latitude,
+                user.longitude,
+                p.user.latitude,
+                p.user.longitude
+              )
+              return { ...p, distanceInKm: distance.toFixed(1) }
+            }
+            return p
+          }).filter(p => {
+            // Se tiver distância, aceita até 10km. Se não tiver lat/lng no prestador, mantém o critério do bairro (já vindo da API)
+            return p.distanceInKm ? Number(p.distanceInKm) <= 10 : true
+          }).sort((a, b) => Number(a.distanceInKm || 999) - Number(b.distanceInKm || 999))
+          
+          setNearbyProviders(filteredByDistance.slice(0, 6))
+        } else {
+          setNearbyProviders(providersList.slice(0, 6))
+        }
+
       } catch (error) {
         console.error("Erro ao carregar prestadores", error)
         setNearbyProviders([])
@@ -183,7 +219,6 @@ export function ClienteDashboard() {
             </div>
           </section>
 
-          {/* --- BLOCO DE CATEGORIAS ALTERNANTES --- */}
           <div>
             <div className="flex items-center justify-between max-w-5xl mx-auto md:mt-15 mb-2 px-1 animate-fade-in delay-100">
               <div className="flex items-center gap-2">
@@ -209,7 +244,6 @@ export function ClienteDashboard() {
             </section>
           </div>
 
-          {/* HISTÓRICO */}
           <section className="max-w-xl mx-auto animate-fade-in delay-200 !mt-10 md:!mt-16">
             <div 
               onClick={() => navigate("/historico")} 
@@ -225,12 +259,11 @@ export function ClienteDashboard() {
                 </div>
               </div>
               <div className="bg-muted px-3 py-1.5 rounded-lg text-sm font-bold text-muted-foreground">
-                 {historyCount}
+                  {historyCount}
               </div>
             </div>
           </section>
 
-          {/* PRÓXIMOS DE VOCÊ */}
           <section className="animate-fade-in delay-300 max-w-5xl mx-auto w-full">
             <div className="flex items-center justify-between mb-4 md:mb-6 px-1">
               <div className="flex items-center gap-2">
@@ -248,7 +281,6 @@ export function ClienteDashboard() {
                     className="relative bg-card border border-border rounded-2xl p-6 md:p-7 shadow-sm hover:shadow-md transition-all flex items-start gap-3 md:gap-4 hover:scale-[1.02] duration-300 cursor-pointer overflow-hidden"
                     onClick={() => {navigate(`/prestador/${provider.id}`)}}
                   >
-                    {/* LÓGICA DE SELOS (SHIELD E ROCKET) */}
                     {provider.isFeatured && (
                       <div className="absolute top-2 left-2 right-2 z-20 flex justify-between items-start pointer-events-none">
                         <div className="flex items-center gap-1.5 rounded-full bg-gradient-to-b from-yellow-300 to-yellow-500 p-1.5 text-yellow-950 shadow-lg border-t border-white/50">
@@ -286,14 +318,23 @@ export function ClienteDashboard() {
                       <p className="text-xs text-primary font-bold mb-0.5 md:mb-1 truncate">
                         {formatText(provider.category)}
                       </p>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
-                          <MapPin className="w-3 h-3 flex-shrink-0" /> 
-                          <span className="truncate">
-                            {provider.user.neighborhood 
-                              ? `${formatText(provider.user.neighborhood)} - ${formatText(provider.user.city)}` 
-                              : formatText(provider.user.city)
-                            }
-                          </span>
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
+                            <MapPin className="w-3 h-3 flex-shrink-0" /> 
+                            <span className="truncate">
+                              {provider.user.neighborhood 
+                                ? `${formatText(provider.user.neighborhood)}` 
+                                : formatText(provider.user.city)
+                              }
+                            </span>
+                        </div>
+                        {/* EXIBIÇÃO DA DISTÂNCIA SE DISPONÍVEL */}
+                        {provider.distanceInKm && (
+                          <div className="flex items-center gap-1 text-[10px] font-bold text-primary">
+                             <Zap className="w-2.5 h-2.5" />
+                             <span>A {provider.distanceInKm} km de você</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
