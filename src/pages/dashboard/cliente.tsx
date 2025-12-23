@@ -105,40 +105,43 @@ export function ClienteDashboard() {
       if (!user) return 
       try {
         const params = new URLSearchParams()
+        
+        // 1. Buscamos pela CIDADE inteira, sem travar no bairro
         if (user.city) params.append("city", user.city)
-        if (user.neighborhood) params.append("neighborhood", user.neighborhood)
-        params.append("limit", "15") // Aumentado o limite para filtrar no front depois
+        
+        // 2. Aumentamos o limite para ter mais opções de cálculo
+        params.append("limit", "40") 
 
         const res = await fetch(`${API_URL}/providers?${params.toString()}`)
         const responseData = await res.json()
         
-        let providersList: Provider[] = []
-        if (Array.isArray(responseData)) {
-          providersList = responseData
-        } else if (responseData && Array.isArray(responseData.data)) {
-          providersList = responseData.data
-        }
+        // O seu backend retorna { data: [...] }, por isso acessamos responseData.data
+        const providersList = responseData.data || []
 
-        // --- DUPLA VERIFICAÇÃO: FILTRO POR RAIO (HAVERSINE) ---
         if (user.latitude && user.longitude) {
-          const filteredByDistance = providersList.map(p => {
-            if (p.user.latitude && p.user.longitude) {
-              const distance = getDistanceInKm(
-                user.latitude,
-                user.longitude,
-                p.user.latitude,
-                p.user.longitude
-              )
-              return { ...p, distanceInKm: distance.toFixed(1) }
-            }
-            return p
-          }).filter(p => {
-            // Se tiver distância, aceita até 10km. Se não tiver lat/lng no prestador, mantém o critério do bairro (já vindo da API)
-            return p.distanceInKm ? Number(p.distanceInKm) <= 10 : true
-          }).sort((a, b) => Number(a.distanceInKm || 999) - Number(b.distanceInKm || 999))
+          const filteredByDistance = providersList
+            .map(p => {
+              // Acessando conforme o seu include do prisma: p.user.latitude
+              if (p.user?.latitude && p.user?.longitude) {
+                const distance = getDistanceInKm(
+                  Number(user.latitude),
+                  Number(user.longitude),
+                  Number(p.user.latitude),
+                  Number(p.user.longitude)
+                )
+                return { ...p, distanceInKm: distance.toFixed(1) }
+              }
+              return p
+            })
+            .filter(p => {
+              // 3. Filtro de 15km (ideal para a Grande São Luís)
+              return p.distanceInKm ? Number(p.distanceInKm) <= 15 : false
+            })
+            .sort((a, b) => Number(a.distanceInKm || 999) - Number(b.distanceInKm || 999))
           
           setNearbyProviders(filteredByDistance.slice(0, 6))
         } else {
+          // Se o cliente logado não tiver lat/long, mostra por bairro (fallback)
           setNearbyProviders(providersList.slice(0, 6))
         }
 

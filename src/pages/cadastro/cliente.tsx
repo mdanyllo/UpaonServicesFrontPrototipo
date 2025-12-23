@@ -33,31 +33,34 @@ export function Cliente() {
     setPhone(value);
   };
 
-  // FUNÇÃO PARA BUSCAR CEP E COORDENADAS
+  
+// FUNÇÃO PARA BUSCAR CEP E COORDENADAS
 const handleCEPBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
   const cep = e.target.value.replace(/\D/g, '');
 
   if (cep.length === 8) {
     try {
-      const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${cep}`);
+      // Alterado para AwesomeAPI
+      const response = await fetch(`https://cep.awesomeapi.com.br/json/${cep}`);
       const data = await response.json();
 
       if (response.ok) {
+        // Na AwesomeAPI os campos são 'city' e 'state'
         const cityFromApi = `${data.city} - ${data.state}`;
 
-    
         if (cities.includes(cityFromApi)) {
           setCity(cityFromApi);
-          setNeighborhood(data.neighborhood || "");
+          // Na AwesomeAPI o bairro vem no campo 'district'
+          setNeighborhood(data.district || "");
 
-        
-          if (data.location && data.location.coordinates) {
-            setLatitude(data.location.coordinates.latitude);
-            setLongitude(data.location.coordinates.longitude);
+          // Coordenadas diretas: data.lat e data.lng
+          if (data.lat && data.lng) {
+            setLatitude(parseFloat(data.lat));
+            setLongitude(parseFloat(data.lng));
           }
+          
           toast.success("Endereço localizado e preenchido!");
         } else {
-   
           setCity("");
           setNeighborhood("");
           toast.error("No momento, a Upaon atende apenas na Grande São Luís.");

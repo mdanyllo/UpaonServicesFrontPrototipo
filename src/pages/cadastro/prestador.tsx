@@ -53,44 +53,47 @@ export function Prestador() {
     setPhone(value);
   };
 
-      // FUNÇÃO PARA BUSCAR CEP E COORDENADAS
+
+  // FUNÇÃO PARA BUSCAR CEP E COORDENADAS
   const handleCEPBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
-    const cep = e.target.value.replace(/\D/g, '');
-  
-    if (cep.length === 8) {
-      try {
-        const response = await fetch(`https://brasilapi.com.br/api/cep/v2/${cep}`);
-        const data = await response.json();
-  
-        if (response.ok) {
-          const cityFromApi = `${data.city} - ${data.state}`;
-  
-      
-          if (cities.includes(cityFromApi)) {
-            setCity(cityFromApi);
-            setNeighborhood(data.neighborhood || "");
-  
-          
-            if (data.location && data.location.coordinates) {
-              setLatitude(data.location.coordinates.latitude);
-              setLongitude(data.location.coordinates.longitude);
-            }
-            toast.success("Endereço localizado e preenchido!");
-          } else {
-     
-            setCity("");
-            setNeighborhood("");
-            toast.error("No momento, a Upaon atende apenas na Grande São Luís.");
+  const cep = e.target.value.replace(/\D/g, '');
+
+  if (cep.length === 8) {
+    try {
+      // Alterado para AwesomeAPI
+      const response = await fetch(`https://cep.awesomeapi.com.br/json/${cep}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        // Na AwesomeAPI os campos são 'city' e 'state'
+        const cityFromApi = `${data.city} - ${data.state}`;
+
+        if (cities.includes(cityFromApi)) {
+          setCity(cityFromApi);
+          // Na AwesomeAPI o bairro vem no campo 'district'
+          setNeighborhood(data.district || "");
+
+          // Coordenadas diretas: data.lat e data.lng
+          if (data.lat && data.lng) {
+            setLatitude(parseFloat(data.lat));
+            setLongitude(parseFloat(data.lng));
           }
+          
+          toast.success("Endereço localizado e preenchido!");
         } else {
-          toast.error("CEP não encontrado. Verifique os números.");
+          setCity("");
+          setNeighborhood("");
+          toast.error("No momento, a Upaon atende apenas na Grande São Luís.");
         }
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
-        toast.error("Erro ao conectar com o serviço de CEP.");
+      } else {
+        toast.error("CEP não encontrado. Verifique os números.");
       }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+      toast.error("Erro ao conectar com o serviço de CEP.");
     }
-  };
+  }
+};
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

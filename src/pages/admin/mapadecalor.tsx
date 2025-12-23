@@ -33,6 +33,8 @@ export function MapaCalorAdmin() {
     }
 
     async function fetchMapData() {
+      console.log("Tentando conectar em:", `${API_URL}/admin/heatmap`);
+      console.log("Token utilizado:", token ? "Encontrado" : "Ausente");
       try {
         const res = await fetch(`${API_URL}/admin/heatmap`, {
           method: "GET",
